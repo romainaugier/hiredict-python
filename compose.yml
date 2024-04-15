@@ -7,3 +7,4 @@ services:
     build: .
     depends_on:
       - redict
+    network_mode: "host"

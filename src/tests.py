@@ -8,12 +8,10 @@ from hiredict.context import HiRedictContext, HiRedictReply
 if __name__ == "__main__":
     option_parser = optparse.OptionParser()
     
-    option_parser.add_option("--hostname", dest="hostname", type="string", default="0.0.0.0")
+    option_parser.add_option("--hostname", dest="hostname", type="string", default="127.0.0.1")
     option_parser.add_option("--port", dest="port", type="int", default=6379)
 
     options, _ = option_parser.parse_args()
-
-    time.sleep(2)
 
     c = HiRedictContext(options.hostname, options.port, 1.0)
 
