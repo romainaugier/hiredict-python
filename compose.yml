@@ -1,0 +1,9 @@
+services:
+  redict:
+    image: "registry.redict.io/redict:7.3.0-bookworm"
+    ports:
+      - "6379:6379"
+  hiredict-python-test:
+    build: .
+    depends_on:
+      - redict
