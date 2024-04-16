@@ -3,6 +3,9 @@ services:
     image: "registry.redict.io/redict:7.3.0-bookworm"
     ports:
       - "6379:6379"
+    command: /data/redict.conf
+    volumes:
+      - ./conf/redict.conf:/data/redict.conf
   hiredict-python-test:
     build: .
     depends_on:
