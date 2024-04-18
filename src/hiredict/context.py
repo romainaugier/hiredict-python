@@ -11,70 +11,22 @@ import hiredict.net as net
 
 REPLY_BUF_SIZE = 256
 
-
-class HiRedictReply():
-
-    __slots__ = (
-        "_buffer"
-    )
-    
-    def __init__(self) -> None:
-        self._buffer = io.BytesIO()
-
-    def _parse_reply(self) -> bytes:
-        r_bufs = [v for v in self._buffer.getvalue().split(b"\r\n") if v.strip() != b""]
-        
-        if len(r_bufs) != 2:
-            return r_bufs[0]
-
-        length, value = r_bufs
-
-        length = int(length.replace(b"$", b""))
-
-        value = value[0:length]
-
-        return value
-
-    @staticmethod
-    def Error() -> HiRedictReply:
-        return HiRedictReply()
-
-    def append(self, content: bytes) -> None:
-        self._buffer.write(content)
-
-    def asBytes(self) -> bytes:
-        return self._parse_reply()
-
-    def asString(self) -> str:
-        return str(self._parse_reply())
-
-    def asInteger(self) -> int:
-        return int(self._parse_reply())
-
-    def Ok(self) -> bool:
-        return self._buffer.getvalue()[:3] == b"+OK"
-
-    def Error(self) -> bool:
-        return self._buffer.getbuffer().nbytes == 0 or self._buffer.getvalue()[:4] == b"-ERR"
-
-    def ErrorMessage(self) -> str:
-        if self._buffer.getbuffer().nbytes == 0:
-            return "No error message was returned"
-
-        return self._buffer.getvalue()[3:].decode(error="replace")
-
-    def Pong(self) -> bool:
-        return self._buffer.getvalue()[:5] == b"+PONG"
-
-    def Denied(self) -> bool:
-        return self._buffer.getvalue()[:7] == b"-DENIED"
-
 class HiRedictContext():
     
-    def __init__(self, host: str, port: int, connection_timeout: float = 5.0, recv_timeout: float = 0.1) -> None:
+    def __init__(self,
+                 host: str,
+                 port: int,
+                 db: int = 0,
+                 protocol: int = 2,
+                 connection_timeout: float = 5.0,
+                 recv_timeout: float = 0.1) -> None:
         self._host = host
         self._port = port
+        self._db = db
+        self._protocol = 0
         self._running = False
+
+        self._socket = None
 
         log.debug("Initializing HiRedictContext")
 
